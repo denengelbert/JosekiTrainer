@@ -38,7 +38,7 @@ export class go_board {
                     res ^= this.zobrist[col_to_int(this.state[i][j])][i][j];  
             }
             
-        return res;
+        return res ^ col_to_int(this.current_turn); //need for positional superko
     }
 
     group_at(x:number, y:number): number[][] {
@@ -97,7 +97,7 @@ export class go_board {
             console.log("Illegal move: Suicide");
             return false;
         }
-
+        tmp_board.current_turn = this.next_turn;
         if (this.history.indexOf(tmp_board.hash()) != -1){
             console.log("Illegal move: Superko");
             return false;
@@ -111,6 +111,8 @@ export class go_board {
         this.current_turn = (this.turn%2 === 0? stone_color.white: stone_color.black);
         this.next_turn = ((this.turn+1)%2 === 0? stone_color.white: stone_color.black);
         this.history = [... this.history, this.hash()];
+
+        console.log(this.hash());
 
         return true;
     }
