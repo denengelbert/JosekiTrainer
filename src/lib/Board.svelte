@@ -1,6 +1,11 @@
 <script lang="ts">
 	import {go_board, stone_color} from "$lib/board"
 
+ 
+    export let width= 600; 
+    export let resolution = width; 
+    let id = Math.floor(Math.random()*1000000);
+
     export let initial_size = 19;
     export let board: go_board = new go_board(initial_size);
     export let turn = board.turn; 
@@ -10,37 +15,121 @@
     export let wcaptures: number = 0; 
     $: wcaptures = board.captures[1];
 
+
+
+    let cx: number, cy: number;
+
     export function reset() {
         board = new go_board(board.size);
     }
+
+    function get_coordinate(px: number,py:number): number[]{
+        var brd = document.getElementById("board"+id);
+        if (brd === null)
+            return [0,0];
+        var rect = brd.getBoundingClientRect();
+        let x = 0, y = 0;
+        x = (px-rect.left)/(rect.right-rect.left)*board.size;
+        y = (py-rect.top)/(rect.bottom-rect.top)*board.size;
+        cx = px-rect.left;
+        cy = py-rect.top;
+        x = Math.floor(x);
+        y = Math.floor(y);
+        return [x, y];
+    }
+
+    function draw_stone(x:number, y:number, col:stone_color, translucent:boolean){
+        const stones_canvas = document.getElementById("stones"+id);
+        if (stones_canvas === null) {
+            console.log("No stones found");
+            return;
+        }
+		const stones_context = stones_canvas.getContext('2d');
+        const rect = stones_canvas.getBoundingClientRect();
+        let w = (562/600)*resolution;
+        //(20, 20) (582, 75), (584, 584)
+       // console.log(w);
+        stones_context.beginPath();
+       // console.log(x*(w/(board.size-1))+100, (y+0.5)*(w/board.size)+10, w/(1.8*board.size));
+        stones_context.arc(x*(w/(board.size-1))+19*(resolution/600), y*(w/(board.size-1))+19*(resolution/600),
+             w/(2.2*(board.size-1)), 0, 2*Math.PI);
+
+        let alpha = (translucent? 50: 100);
+        if (col === stone_color.black)
+            stones_context.fillStyle = "rgb(0 0 0 / " + alpha +"%)";
+        if (col === stone_color.white)
+            stones_context.fillStyle = "rgb(255 255 255 / " + alpha+"%)";
+        stones_context.fill();
+    }
+
+    function draw_board(hx: number, hy: number){
+        const stones_canvas = document.getElementById("stones"+id);
+        if (stones_canvas === null) {
+            console.log("No stones found");
+            return;
+        }
+        const stones_context = stones_canvas.getContext('2d');
+        const rect = stones_canvas.getBoundingClientRect();
+        stones_context.clearRect(0, 0, resolution, resolution);
+        for (let x = 0; x < board.size; x++)
+            for (let y = 0; y < board.size; y++)
+                if (board.state[x][y] != stone_color.empty)
+                    draw_stone(x,y, board.state[x][y], false);
+        if (hx != -1)
+         draw_stone(hx,hy, board.current_turn, true);
+    }
+
+    function click_point(event: { clientX: number; clientY: number; }){
+        let x, y;
+        [x, y] = get_coordinate(event.clientX, event.clientY);
+       // console.log(x, y);
+        if (board.play_move(x,y)) {
+            draw_board(-1, -1);
+            board = board; //to update captures
+        }
+    }
+
+    let old_x = -1, old_y = -1;
+
+    function hover_point(event: { clientX: number; clientY: number; }){
+        let x, y;
+        [x, y] = get_coordinate(event.clientX, event.clientY);
+        if (board.state[x][y] != stone_color.empty)
+            return;
+        if (x != old_x || y != old_y)
+            draw_board(x,y);
+        [old_x, old_y] = [x, y];
+    }
+
 </script>
 
-<div class="board_style">
-    {#each [...Array(initial_size).keys()] as x}
-        {#each [...Array(initial_size).keys()] as y}
-            <button	class="intersection"
-            
-             style="border: hidden; 
-             border-radius: 50%; background: {board.state[x][y]}"
-            on:click={()=> {board.play_move(x,y); board = board;}} 
-            >.</button>
-        {/each}
-        <br> 
-    {/each}
+<!-- svelte-ignore a11y-click-events-have-key-events -->
+<!-- svelte-ignore a11y-no-static-element-interactions -->
+
+<div class="board_style" id="board{id}" 
+on:click={click_point}
+on:mousemove={hover_point}
+on:mouseleave={() => {draw_board(-1, -1)}}
+style="max-width:  {width}px;">
+<canvas id="stones{id}" class="canvas_style"
+width ="{resolution}" height="{resolution}">
+</canvas>
 </div>
-    
+
+
 <style> 
     .board_style {
-        aspect-ratio: 1;
-           max-width:600px;
+           aspect-ratio: 1;
            background-image: url('board.png'); 
            background-size: 100% 100%;
-           padding-left: 0.666%;
+           position:relative;
     }
-    .intersection{
-        color: transparent;
-        aspect-ratio: 1;
-        padding: 2.00% 2.294%;
-        background: var(--color, blue );
+
+    .canvas_style {
+        position:absolute;
+        width:100%;
+        height:100%;
+        top:0px;
+        left:0px;
     }
 </style>

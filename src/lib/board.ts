@@ -79,18 +79,22 @@ export class go_board {
         tmp_board.state[x][y] = this.current_turn;
 
         let to_be_removed:number[][] = [];
-        if ((x < this.size) && (tmp_board.state[x+1][y] === this.next_turn)
-            && tmp_board.liberties_at(x+1,y)=== 0)
-            to_be_removed = to_be_removed.concat(tmp_board.group_at(x+1,y));
-        if ((x > 0) && (tmp_board.state[x-1][y] === this.next_turn)
-            && tmp_board.liberties_at(x-1,y)=== 0)
-            to_be_removed = to_be_removed.concat(tmp_board.group_at(x-1,y));
-        if ((y < this.size) && (tmp_board.state[x][y+1] === this.next_turn)
-            && tmp_board.liberties_at(x,y+1)=== 0)
-            to_be_removed = to_be_removed.concat(tmp_board.group_at(x,y+1));
-        if ((y > 0) && (tmp_board.state[x][y-1] === this.next_turn)
-            && tmp_board.liberties_at(x,y-1) === 0)
-            to_be_removed = to_be_removed.concat(tmp_board.group_at(x,y-1));
+        if ((x < this.size-1))
+            if ((tmp_board.state[x+1][y] === this.next_turn)
+             && tmp_board.liberties_at(x+1,y)=== 0)
+                to_be_removed = to_be_removed.concat(tmp_board.group_at(x+1,y));
+        if ((x > 0))
+            if ( (tmp_board.state[x-1][y] === this.next_turn)
+                && tmp_board.liberties_at(x-1,y)=== 0)
+                to_be_removed = to_be_removed.concat(tmp_board.group_at(x-1,y));
+        if ((y < this.size-1))
+            if ( (tmp_board.state[x][y+1] === this.next_turn)
+                && tmp_board.liberties_at(x,y+1)=== 0)
+                to_be_removed = to_be_removed.concat(tmp_board.group_at(x,y+1));
+        if ((y > 0))
+            if ( (tmp_board.state[x][y-1] === this.next_turn)
+                && tmp_board.liberties_at(x,y-1) === 0)
+                to_be_removed = to_be_removed.concat(tmp_board.group_at(x,y-1));
 
         tmp_board.remove(to_be_removed);
         if (tmp_board.liberties_at(x, y) === 0) {
@@ -112,7 +116,7 @@ export class go_board {
         this.next_turn = ((this.turn+1)%2 === 0? stone_color.white: stone_color.black);
         this.history = [... this.history, this.hash()];
 
-        console.log(this.hash());
+        //console.log(this.hash());
 
         return true;
     }
