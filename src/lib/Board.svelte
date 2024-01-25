@@ -1,5 +1,6 @@
 <script lang="ts">
 	import {go_board, stone_color} from "$lib/board"
+    import { draw } from "svelte/transition";
 
  
     export let width= 600; 
@@ -21,6 +22,7 @@
 
     export function reset() {
         board = new go_board(board.size);
+        draw_board();
     }
 
     function get_coordinate(px: number,py:number): number[]{
@@ -62,7 +64,7 @@
         stones_context.fill();
     }
 
-    function draw_board(hx: number, hy: number){
+    function draw_board(hx: number = -1, hy: number = -1){
         const stones_canvas = document.getElementById("stones"+id);
         if (stones_canvas === null) {
             console.log("No stones found");
@@ -99,6 +101,27 @@
         if (x != old_x || y != old_y)
             draw_board(x,y);
         [old_x, old_y] = [x, y];
+    }
+
+    function str_to_pair(move: string): number[] {
+        return [move.charCodeAt(0)-'a'.charCodeAt(0), 
+                move.charCodeAt(1)-'a'.charCodeAt(0)]
+    }
+    
+
+    export function play_moves(moves: string[]): boolean {
+        if (!board.play_moves(moves.map(str_to_pair)))
+            return false;
+        draw_board();
+        return true;
+    }
+    export function highlight(moves: string[]): boolean {
+        //console.log(moves);
+        let mv = moves.map(str_to_pair);
+        console.log(moves.length);
+        for (let i =0; i < moves.length;i++)
+            draw_stone(mv[i][0], mv[i][1], board.current_turn, true);
+        return true;
     }
 
 </script>

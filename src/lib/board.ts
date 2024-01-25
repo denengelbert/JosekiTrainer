@@ -121,6 +121,14 @@ export class go_board {
         return true;
     }
 
+    play_moves(moves: number[][]): boolean {
+        for (let i = 0; i < moves.length; i++) {
+            if (!this.play_move(moves[i][0], moves[i][1]))
+                return false;
+        }
+        return true;
+    }
+
     dfs(sx: number, sy: number, oc: stone_color, nc:stone_color, nb:stone_color): void {
 		if (sx < 0 || sx >=this.size|| sy < 0 || sy > this.size)
 			return;
