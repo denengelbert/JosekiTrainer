@@ -21,9 +21,15 @@
 
 <button on:click={() => board.reset()}>Reset</button>
 
+{#if moves}
 {#each moves as move}
 <button on:click={() => {board.reset();board.play_moves(move.current_pos);board.highlight(move.next_moves)}}>Joseki</button>
+<form action="" method="post">
+    <button name="id" value="{move.id}">Delete</button>
+</form>
+
 {/each}
+{/if}
 <Board bind:turn={turn} 
        bind:bcaptures={bcaptures}
 	   bind:wcaptures={wcaptures}

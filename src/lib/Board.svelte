@@ -110,8 +110,14 @@
     
 
     export function play_moves(moves: string[]): boolean {
-        if (!board.play_moves(moves.map(str_to_pair)))
+
+        console.log(moves);
+        if (!board.play_moves(moves.map(str_to_pair))) {
+            console.log('problem at playing moves');
             return false;
+        }
+        console.log('OK');
+
         draw_board();
         return true;
     }

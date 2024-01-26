@@ -2,7 +2,6 @@ let t= 10;
 export function load_sgf_rec(input: string): any {
     let res: any[] = [];
     let branch: string;
-
     if (input.length===0)
         return {};
     if (input[0]!= '(') {
@@ -48,6 +47,16 @@ export function load_sgf_rec(input: string): any {
     return  res;
 }
 
+function find_closing_bracket(input: string): number {
+ let cur = 0;
+    for (let i = 0; i < input.length; i++) {
+        if (input[i] === "[") cur++;
+        if (input[i] === "]") cur--;
+        if (cur === 0) return i;
+    }
+    return -1;
+}
+
 export function load_sgf(input: string): any {
  /*
 	(;GM[1]FF[4]CA[UTF-8]AP[Sabaki:0.52.2]KM[6.5]SZ[19]DT[2024-01-24])
@@ -57,11 +66,25 @@ export function load_sgf(input: string): any {
 	(;G;B[pd](;W[qc];B[pc];W[qd])(;W[qf];B[nc];W[qd]LB[oq:blabla][qd:arst]))
     */
      input = input.trim();
-    if (input.length===0)
-        return {};
 
     input = input.substring(2, input.length-1);
     input = input.substring(input.indexOf(';')+1);
+
+     while (input.includes('C')) {
+        let start = input.indexOf('C');
+        let end  = find_closing_bracket(input.substring(start+1));
+
+        //console.log(start, end, input.substring(start, start+end+2));
+
+        if (end === -1) {
+            console.log("Malformed SGF");
+            return {};
+        }
+        input = input.replace(input.substring(start, start+end+1), '');
+       // console.log(input, 1);
+       // console.log("   ");
+     }
+
 
     let current = input.substring(0,input.indexOf(';'));
     let rest = input.substring(input.indexOf(';')+1);

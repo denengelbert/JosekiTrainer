@@ -70,6 +70,7 @@ export class go_board {
     }
 
     play_move(x:number, y:number): boolean {
+        console.log(x,y);
         if (this.state[x][y] === stone_color.black || this.state[x][y] === stone_color.white)
             return false;
         let tmp_board = new go_board(this.size);

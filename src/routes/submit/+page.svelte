@@ -1,4 +1,7 @@
+<script lang="ts">
 
+	
+</script>
 
 <form method="POST">
 	<label>
@@ -10,5 +13,7 @@
 		/>
 	</label>
 </form>
+
+<p>Don't use ';' in the game comments or labels</p>
 
 
