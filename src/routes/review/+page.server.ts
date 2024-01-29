@@ -35,7 +35,7 @@ export const actions = {
          if (result && result.deletedCount) {
           console.log(`Successfully removed move with id ${data.get("id")}`);
       } else if (!result) {
-          rconsole.log(`Failed to remove move with id ${data.get("id")}`);
+          console.log(`Failed to remove move with id ${data.get("id")}`);
       } else if (!result.deletedCount) {
           console.log(`Move with id ${data.get("id")} does not exist`);
       }

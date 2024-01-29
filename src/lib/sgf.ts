@@ -1,11 +1,42 @@
+import { Console } from "console";
+
 let t= 10;
-export function load_sgf_rec(input: string): any {
+export function load_sgf(input: string): any {
+
+    if (input.includes('G')) {
+        input = input.trim();
+
+        input = input.substring(2, input.length-1);
+        input = input.substring(input.indexOf(';')+1);
+        
+        if (input[0] != 'B' && input[0] != 'W' && input[0] != '(') {
+            throw 'Malformed SGF' ;
+        }
+
+       // console.log(input);
+        //remove comments
+         while (input.includes('C')) {
+            let start = input.indexOf('C');
+            let end  = find_closing_bracket(input.substring(start+1));
+    
+            //console.log(start, end, input.substring(start, start+end+2));
+    
+            if (end === -1) {
+                throw 'Malformed SGF' ;
+            }
+            input = input.replace(input.substring(start, start+end+1), '');
+           // console.log(input, 1);
+           // console.log("   ");
+         }
+    }
     let res: any[] = [];
     let branch: string;
-    if (input.length===0)
+    if (input.length < 5)
         return {};
     if (input[0]!= '(') {
+        //No splitting at this node
         if (!input.includes(';')) {
+            //only one move left
             return [{
                 move: input.substring(2,4),
                 annotation: input.substring(5),
@@ -19,30 +50,45 @@ export function load_sgf_rec(input: string): any {
             current = current.substring(0,current.indexOf('('));
             rest = input.substring(input.indexOf('('));
         }
+        let r = load_sgf(rest);
+        //console.log(r);
         return [{
             move: input.substring(2,4),
             annotation: current.substring(5),
             end: 'no',
-            next: load_sgf_rec(rest)
+            next: r
         }];
     }
-    while (!(input.length == 0)) {
+    while (!(input.length  <= 3)) {
         branch = input.substring(2,input.indexOf(')')+1);
 
-        input = input.substring(input.indexOf(')')+1);
-        let current = branch.substring(2, branch.indexOf(';'));
+        input = input.substring(input.indexOf(')')+1, input.length);
+        let current = branch.substring(0, branch.indexOf(';')+1);
         let rest = branch.substring(branch.indexOf(';')+1);
         if (current.includes('(')) {
             current = current.substring(0,current.indexOf('('));
             rest = branch.substring(input.indexOf('('));
         }
-
-        res = [... res, {
-            move: branch.substring(2,4),
-            annotation: current.substring(5),
-            end: 'no',
-            next: load_sgf_rec(rest)
-        }];
+       // console.log("currest:", current, rest);
+        if (current.includes('(')) {
+            current = current.substring(0,current.indexOf('('));
+            rest = branch.substring(input.indexOf('('));
+        }
+        if (!input.includes(';')) {
+            res = [... res, {
+                    move:  branch.substring(2,4),
+                    annotation:  branch.substring(5),
+                    end: 'yes',
+                    next: []
+                }];
+        } else {
+            res = [... res, {
+                move: branch.substring(2,4),
+                annotation: current.substring(5),
+                end: 'no',
+                next: load_sgf(rest)
+            }];
+        }
     }
     return  res;
 }
@@ -55,47 +101,4 @@ function find_closing_bracket(input: string): number {
         if (cur === 0) return i;
     }
     return -1;
-}
-
-export function load_sgf(input: string): any {
- /*
-	(;GM[1]FF[4]CA[UTF-8]AP[Sabaki:0.52.2]KM[6.5]SZ[19]DT[2024-01-24])
-	(;GM[1]FF[4]CA[UTF-8]AP[Sabaki:0.52.2]KM[6.5]SZ[19]DT[2024-01-24];B[pd])
-	(;GM[1]FF[4]CA[UTF-8]AP[Sabaki:0.52.2]KM[6.5]SZ[19]DT[2024-01-24];B[pd]LB[oq:blabla][qd:arst];W[qc]LB[oq:blabla][qd:arst])
-	(;G;B[pd](;W[qc];B[pc];W[qd])(;W[qf];B[nc];W[qd]))
-	(;G;B[pd](;W[qc];B[pc];W[qd])(;W[qf];B[nc];W[qd]LB[oq:blabla][qd:arst]))
-    */
-     input = input.trim();
-
-    input = input.substring(2, input.length-1);
-    input = input.substring(input.indexOf(';')+1);
-
-     while (input.includes('C')) {
-        let start = input.indexOf('C');
-        let end  = find_closing_bracket(input.substring(start+1));
-
-        //console.log(start, end, input.substring(start, start+end+2));
-
-        if (end === -1) {
-            console.log("Malformed SGF");
-            return {};
-        }
-        input = input.replace(input.substring(start, start+end+1), '');
-       // console.log(input, 1);
-       // console.log("   ");
-     }
-
-
-    let current = input.substring(0,input.indexOf(';'));
-    let rest = input.substring(input.indexOf(';')+1);
-    if (current.includes('(')) {
-        current = current.substring(0,current.indexOf('('));
-        rest = input.substring(input.indexOf('('));
-    }
-    return {
-        move: current.substring(2,4),
-        annotation: current.substring(5),
-        end: 'no',
-        next: load_sgf_rec(rest),
-    }
 }
