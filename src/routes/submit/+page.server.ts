@@ -1,6 +1,9 @@
-import moves from '$lib/db/moves';
-import {connect, close} from '$lib/db/db';
-import { load_sgf } from '$lib/sgf.js';
+import {insert_moves, get_moves, empty_Move} from '$lib/db/moves';
+import type {Move} from '$lib/db/moves'
+import { load_sgf, empty_sgf_node } from '$lib/sgf.js';
+import type { sgf_node } from '$lib/sgf.js';
+import { get_current_user } from '$lib/user_management.js';
+
 
 export function load({ cookies }) {
 	// ...
@@ -9,33 +12,30 @@ export function load({ cookies }) {
 //{"move":"qf","annotation":";B[nc];W[qd])","next":{}}]]}]}
 
 //(;GM[1]FF[4]CA[UTF-8]AP[Sabaki:0.52.2]KM[6.5]SZ[19]DT[2024-01-25];B[pd];W[qc];B[qd];W[pc];B[od]LB[aa:A];W[nb])
-function get_new_moves(josekis: { annotation: string; move: any; end: string; next: any[] } [], current: string[] = [], min_id: number): { current_pos: string[]; next_moves: any[]; owner: number; id:number}[] {
-  let ret: { current_pos: string[]; next_moves: any[]; owner: number; id: number}[] = [];
-  let joseki;
+function get_new_moves(sgf: sgf_node[], current:string[] = []): Move[] {
+  let ret: Move[] = [];
+  let current_node: sgf_node = sgf[0];
  // console.log(josekis);
-  for (let i =0; i < josekis.length; i++) {
-    joseki = josekis[i];
+  for (let i =0; i < sgf.length; i++) {
+    current_node = sgf[i];
     //console.log(joseki)
-    if (joseki.end == 'yes')
+    if (current_node.end == 'yes')
       break;
-    let cpos = [...current, joseki.move];
-    let nxt_mov = (joseki.next as any[]).map((mv)=>{return mv.move});
-    if (joseki.annotation.includes('aa:A')) {
-      ret = [{
-        current_pos: cpos,
-        next_moves: nxt_mov,
-        owner: 1,
-        id: min_id,
-      }];
+    let cpos = [...current, current_node.move];
+    let nxt_mov = (current_node.next as sgf_node[]).map((mv)=>{return [mv.move, 'No idea'] as [string, string]});
+    if (current_node.annotation.includes('aa:A')) {
+      const cur = empty_Move();
+      cur.current_pos = cpos;
+      cur.next_moves= nxt_mov;
+      ret = [cur];
     }
-    ret = ret.concat(get_new_moves(joseki.next, cpos, min_id+ret.length))
+    ret = ret.concat(get_new_moves(current_node.next, cpos))
   }
   return ret;
-  
 } 
 
 export const actions = {
-	default: async ({ cookies, request }) => {
+	parse: async ({ cookies, request }) => {
         const data = await request.formData();
         let joseki;
         try {
@@ -45,8 +45,7 @@ export const actions = {
           return;
         }
 
-
-        try {
+/* try {
           await connect();
           const ids = await moves.find({owner: 1},  { projection: {
               _id: 0,
@@ -57,14 +56,22 @@ export const actions = {
            new_moves = get_new_moves(joseki, [], Math.max(0, 1+Math.max(...ids.map((id) => {return id.id;}))));
           } catch(err) {
             console.log("Could not parse SGF into Joseki: ", err);
+            return;
           }
-         // console.log(new_moves);
+
           const result = await moves.insertMany(new_moves);
           console.log(`${result.insertedCount} moves inserted`);
         } catch(err) {
           console.log("Could not fetch existing Joseki: ", err);
-        }  finally {
-          await close();    
-        }
+        }  */
+      },
+  add: async ({ cookies, request }) => {
+          const data = await request.formData();
+          let sgf:sgf_node[] = await JSON.parse(data.get('sgf') as string);
+
+          console.log(data.get('sgf'));
+          let moves: Move[] = get_new_moves(sgf);
+          console.log(moves);
+          insert_moves(get_current_user().id, moves);
 	}
 };

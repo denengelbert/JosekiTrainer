@@ -1,5 +1,4 @@
 <script lang='ts'>
-	// @ts-ignore
 	import Board from "$lib/Board.svelte";
 	import type { PageData } from './$types';
 
@@ -21,8 +20,6 @@
 	bind:this={board}
 	width={600}/>
 </div>
-
-
 
 <div id="flex-container">
 {#if moves}

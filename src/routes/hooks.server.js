@@ -1,6 +1,8 @@
-import {run} from '$lib/db/db';
+import {connect,close} from '$lib/db/db';
 
-run().then(() => {
-	console.log('Mongo  started up');
-}).catch(e => {console.error(e)})
-console.log(123)
+/** @type {import('@sveltejs/kit').Handle} */
+export async function handle({ event, resolve }) {
+  await connect();
+  const response = await resolve(event);
+  return response;
+}

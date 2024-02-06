@@ -1,7 +1,18 @@
-import { Console } from "console";
+export interface sgf_node {
+    annotation: string,
+    move: string,
+    end: string,
+    next: sgf_node[]
+}
 
-let t= 10;
-export function load_sgf(input: string): any {
+export const empty_sgf_node = (): sgf_node => ({
+    annotation: '',
+    move: '',
+    end: '',
+    next: []
+});
+
+export function load_sgf(input: string): sgf_node[] {
 
     if (input.includes('G')) {
         input = input.trim();
@@ -32,7 +43,7 @@ export function load_sgf(input: string): any {
     let res: any[] = [];
     let branch: string;
     if (input.length < 5)
-        return {};
+        return [empty_sgf_node()];
     if (input[0]!= '(') {
         //No splitting at this node
         if (!input.includes(';')) {

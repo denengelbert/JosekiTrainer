@@ -41,12 +41,16 @@
     }
 
     function draw_stone(x:number, y:number, col:stone_color, translucent:boolean){
-        const stones_canvas = document.getElementById("stones"+id);
+        const stones_canvas = <HTMLCanvasElement> document.getElementById("stones"+id);
         if (stones_canvas === null) {
             console.log("No stones found");
             return;
         }
 		const stones_context = stones_canvas.getContext('2d');
+        if (stones_context === null) {
+            console.log("No stones found");
+            return;
+        }
         const rect = stones_canvas.getBoundingClientRect();
         let w = (562/600)*resolution;
         //(20, 20) (582, 75), (584, 584)
@@ -65,13 +69,17 @@
     }
 
     function draw_board(hx: number = -1, hy: number = -1){
-        const stones_canvas = document.getElementById("stones"+id);
+        const stones_canvas = <HTMLCanvasElement> document.getElementById("stones"+id);
         if (stones_canvas === null) {
             console.log("No stones found");
             return;
         }
         const stones_context = stones_canvas.getContext('2d');
         const rect = stones_canvas.getBoundingClientRect();
+        if (stones_context === null) {
+            console.log("No stones found");
+            return;
+        }
         stones_context.clearRect(0, 0, resolution, resolution);
         for (let x = 0; x < board.size; x++)
             for (let y = 0; y < board.size; y++)
@@ -103,7 +111,7 @@
         [old_x, old_y] = [x, y];
     }
 
-    function str_to_pair(move: string): number[] {
+    function str_to_pair(move: string): [number, number] {
         return [move.charCodeAt(0)-'a'.charCodeAt(0), 
                 move.charCodeAt(1)-'a'.charCodeAt(0)]
     }
@@ -121,9 +129,9 @@
         draw_board();
         return true;
     }
-    export function highlight(moves: string[]): boolean {
+    export function highlight(moves: [string,string][]): boolean {
         //console.log(moves);
-        let mv = moves.map(str_to_pair);
+        let mv:[number,number][] = moves.map( ([a,b])=> {return str_to_pair(a)});
         console.log(moves.length);
         for (let i =0; i < moves.length;i++)
             draw_stone(mv[i][0], mv[i][1], board.current_turn, true);

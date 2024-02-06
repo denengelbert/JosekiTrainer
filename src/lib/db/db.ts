@@ -9,7 +9,9 @@ const client = new MongoClient(MONGO_DB, {
     }
   });
 
- export async function connect() {
+export default client.db("joseki_trainer");
+
+export async function connect() {
       // Connect the client to the server	(optional starting in v4.7)
       await client.connect();
       // Send a ping to confirm a successful connection
@@ -17,8 +19,9 @@ const client = new MongoClient(MONGO_DB, {
       console.log("Pinged your deployment. You successfully connected to MongoDB!");
   }
 
-  export async function close() {
+export async function close() {
     await client.close();
 }
 
-  export default client.db("joseki_trainer");
+
+
