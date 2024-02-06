@@ -40,6 +40,23 @@ export async function get_moves(owner:number, count:number = 100): Promise<Move[
       else
         return moves;
 }
+
+export async function get_collections(owner:number, count:number = 100): Promise<string[]> {
+  let collections = null;
+  try {
+      const col= await moves_db.find({owner: owner},  { projection: {
+          _id: 0,
+          collection: 1,
+      }}).toArray();
+      collections = col.map((cur)=>{return cur.collection});
+    } catch(err) {
+      console.log("Could not fetch list of collections: ", err);
+    }
+    if (collections === null)
+      return [];
+    else
+      return [...new Set(collections)];
+}
 export async function insert_move(owner:number, move:Move) {
    insert_moves(owner, [move]);
 }

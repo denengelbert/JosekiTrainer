@@ -5,7 +5,7 @@ interface Card {
     owner: number, 
     move_id: number, 
     quest_type: string, 
-    stack: string,
+    collection: string,
     buried: boolean,
     srs: string,
 }
@@ -13,30 +13,20 @@ let cards_db = db.collection<Card>('reviews')
 
 export default db.collection('reviews')
 
-function new_card( owner: number = 1, move_id = 1, quest_type = 'next_move', stack:string = 'default'): Card{
+export function empty_card( owner: number = 1, move_id = 1, quest_type = 'next_move', stack:string = 'default'): Card{
     return {
             id: -1,
             owner: owner, 
             move_id: move_id, 
             quest_type: quest_type, 
-            stack: stack,
+            collection: stack,
             buried: false,
             srs: '',
     }
 }
 
 export async function insert_card(card: Card) {
-    try {
-        const ids = await cards_db.find({},  { projection: {
-            _id: 0,
-            id: 1,
-        }}).toArray();
-        card.id = Math.max(0, 1+Math.max(...ids.map((id) => {return id.id;})));
-        const result = await cards_db.insertOne(card);
-        console.log(`One new card inserted`);
-      } catch(err) {
-        console.log("Could not insert card successfully: ", err);
-      }  
+    insert_cards([card]);
 }
 export async function insert_cards(cards: Card[]) {
     try {

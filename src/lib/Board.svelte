@@ -143,11 +143,10 @@
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <!-- svelte-ignore a11y-no-static-element-interactions -->
 
-<div class="board_style" id="board{id}" 
+<div class="board_style rounded-lg" id="board{id}" 
 on:click={click_point}
 on:mousemove={hover_point}
-on:mouseleave={() => {draw_board(-1, -1)}}
-style="max-width:  {width}px;">
+on:mouseleave={() => {draw_board(-1, -1)}}>
 <canvas id="stones{id}" class="canvas_style"
 width ="{resolution}" height="{resolution}">
 </canvas>
