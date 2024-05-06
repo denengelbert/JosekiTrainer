@@ -15,7 +15,7 @@ export function load({ cookies }) {
 function get_new_moves(sgf: sgf_node[], current:string[] = []): Move[] {
   let ret: Move[] = [];
   let current_node: sgf_node = sgf[0];
- // console.log(josekis);
+  //console.log(josekis);
   for (let i =0; i < sgf.length; i++) {
     current_node = sgf[i];
     //console.log(joseki)
@@ -31,7 +31,7 @@ function get_new_moves(sgf: sgf_node[], current:string[] = []): Move[] {
     }
     ret = ret.concat(get_new_moves(current_node.next, cpos))
   }
-  return ret;
+  return ret.slice(0, -1);
 } 
 
 export const actions = {
@@ -68,10 +68,11 @@ export const actions = {
   add: async ({ cookies, request }) => {
           const data = await request.formData();
           let sgf:sgf_node[] = await JSON.parse(data.get('sgf') as string);
-
-          console.log(data.get('sgf'));
+          let collection:string = await (data.get('collection') as string);
+          console.log(collection);
           let moves: Move[] = get_new_moves(sgf);
+          console.log("New moves");
           console.log(moves);
-          insert_moves(get_current_user().id, moves);
+          insert_moves(get_current_user().id, moves, collection);
 	}
 };

@@ -1,27 +1,32 @@
 import db from '$lib/db/db'
+import {createEmptyCard, formatDate, fsrs, generatorParameters, Rating, Grades} from 'ts-fsrs';
+import type {Card as SRSCard} from 'ts-fsrs';
+import type { Move } from './moves';
 
-interface Card {
+export interface Card {
     id: number,
     owner: number, 
-    move_id: number, 
+    move: Omit<Move, "id" | "owner">, 
     quest_type: string, 
     collection: string,
     buried: boolean,
-    srs: string,
+    srs: SRSCard,
 }
 let cards_db = db.collection<Card>('reviews')
+const params = generatorParameters();
+const srs_algorithm = fsrs(params);
 
 export default db.collection('reviews')
 
-export function empty_card( owner: number = 1, move_id = 1, quest_type = 'next_move', stack:string = 'default'): Card{
+export function empty_card( owner: number = 1, move: Move, quest_type = 'next_move', stack:string = 'default'): Card{
     return {
             id: -1,
             owner: owner, 
-            move_id: move_id, 
+            move: move, 
             quest_type: quest_type, 
             collection: stack,
             buried: false,
-            srs: '',
+            srs: createEmptyCard(),
     }
 }
 
@@ -34,8 +39,10 @@ export async function insert_cards(cards: Card[]) {
             _id: 0,
             id: 1,
         }}).toArray();
-        for (let i = 0; i < cards.length; i++)
-            cards[i].id = i+Math.max(0, 1+Math.max(...ids.map((id) => {return id.id;})));
+        let max_id = ids.length;
+        for (let i = 0; i < cards.length; i++) 
+            cards[i].id = i+Math.max(0, 1+max_id);
+        console.log(cards);
         const result = await cards_db.insertMany(cards);
         console.log(`${result.insertedCount} new cards inserted`);
       } catch(err) {
@@ -53,7 +60,7 @@ export async function fetch_cards(owner: number): Promise<Card[]> {
             _id: 0,
             id: 1,
             owner: 1, 
-            move_id: 1, 
+            move: 1, 
             quest_type: 1, 
             stack: 1,
             buried: 1,
@@ -67,5 +74,18 @@ export async function fetch_cards(owner: number): Promise<Card[]> {
       else
         return cards;
 }
+
+
+export async function fetch_scheduled_cards(owner: number): Promise<Card[]> {
+    let cards = await fetch_cards(owner);
+    if (cards === null)
+      return [];
+    else { 
+      return cards.filter((card) => Date.parse(card.srs.due.toISOString()) < Date.now());
+    }
+}
+
+
+
 
 

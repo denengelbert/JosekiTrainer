@@ -1,3 +1,4 @@
+
 export enum stone_color {
     empty = "transparent",
     black = "black",
@@ -6,7 +7,7 @@ export enum stone_color {
     neighbouring = "nb"
 };
 
-function col_to_int( color:stone_color) {
+export function col_to_int( color:stone_color) {
     if (color === stone_color.black)
         return 0;
     if (color === stone_color.white)
@@ -14,13 +15,26 @@ function col_to_int( color:stone_color) {
     return 2;
 }
 
+export function str_to_pair(move: string): [number, number] {
+    return [move.charCodeAt(0)-'a'.charCodeAt(0), 
+            move.charCodeAt(1)-'a'.charCodeAt(0)]
+}
+
+export function validPoint(x: number, y: number, size: number) {
+    if (0 > x || x >= size)
+        return false;
+    if (0 > y || y >= size)
+        return false;
+    return true;
+}
+
 
 
 export class go_board {
     turn : number = 1;
     size: number = 19;
-    state: stone_color[][];
-    private tmp_state: stone_color[][];
+    state: stone_color[][] = [];
+    private tmp_state: stone_color[][] = [];
     captures: number[] = [0,0];
     komi: number = 6.5;
 
@@ -28,7 +42,8 @@ export class go_board {
     next_turn: stone_color = stone_color.white;
 
     history: number[] = [0];
-    zobrist: number[][][];
+    moves: [number, number, stone_color][] = [];
+    zobrist: number[][][] = [];
 
     hash(): number{
         let res = 0;
@@ -71,6 +86,8 @@ export class go_board {
 
     play_move(x:number, y:number): boolean {
         console.log(x,y);
+        if (!validPoint(x,y,this.size))
+            return true;
         if (this.state[x][y] === stone_color.black || this.state[x][y] === stone_color.white)
             return false;
         let tmp_board = new go_board(this.size);
@@ -112,6 +129,7 @@ export class go_board {
         this.captures[col_to_int(this.current_turn)] = this.captures[col_to_int(this.current_turn)]+ to_be_removed.length;
 
         this.state[x][y] = this.current_turn;
+        this.moves = [... this.moves, [x,y, this.current_turn]];
         this.turn += 1;
         this.current_turn = (this.turn%2 === 0? stone_color.white: stone_color.black);
         this.next_turn = ((this.turn+1)%2 === 0? stone_color.white: stone_color.black);
@@ -127,6 +145,21 @@ export class go_board {
             if (!this.play_move(moves[i][0], moves[i][1]))
                 return false;
         }
+        return true;
+    }
+
+    undo() {
+        const history = this.history.slice(0,-1);
+        const moves = this.moves.slice(0, -1);
+       
+        console.log(moves);
+        console.log(moves.map(([x,y, col]) => [x,y]));
+        this.reset();
+
+
+        this.play_moves(moves.map(([x,y, col]) => [x,y]));
+
+        console.log(this.state);
         return true;
     }
 
@@ -152,10 +185,27 @@ export class go_board {
 	}
 
 
-    constructor(size_init = 19){
-        this.size = size_init;
+    reset(){
         this.state = [];
         this.tmp_state = [];
+        for (let x = 0; x < this.size; x++) {
+            this.state[x] = [];
+            this.tmp_state[x] = []; 
+            for (let y = 0; y <= this.size; y++) {
+                this.state[x][y] = this.tmp_state[x][y] = stone_color.empty;
+            }
+        }
+
+        this.turn = 1;
+        this.history =[0];
+        this.moves = [];
+        this.current_turn = stone_color.black;
+        this.next_turn = stone_color.white;
+        this.captures = [0,0];
+    }
+
+    constructor(size_init = 19){
+        this.size = size_init;
 
         this.zobrist = [new Array(this.size), new Array(this.size),new Array(this.size)];
 
@@ -165,7 +215,7 @@ export class go_board {
             this.zobrist[0][x]= new Array(this.size);
             this.zobrist[1][x]= new Array(this.size);
             this.zobrist[2][x]= new Array(this.size);
-            for (let y = 0; y < this.size; y++) {
+            for (let y = 0; y <= this.size; y++) {
                 this.state[x][y] = this.tmp_state[x][y] = stone_color.empty;
                 
                 this.zobrist[0][x][y] = Math.floor(Math.random() * (1 << 30));
@@ -175,5 +225,6 @@ export class go_board {
 
         }
     }
-}
+ }
+
 

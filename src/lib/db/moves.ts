@@ -20,7 +20,7 @@ export const empty_Move = (): Move => ({
 const moves_db = db.collection<Move>('moves')
 export default moves_db
 
-export async function get_moves(owner:number, count:number = 100): Promise<Move[]> {
+export async function get_moves(owner:number, count:number = 100, collection:string='none'): Promise<Move[]> {
     let moves = null;
     try {
         moves = await moves_db.find({owner: owner},  { projection: {
@@ -57,10 +57,10 @@ export async function get_collections(owner:number, count:number = 100): Promise
     else
       return [...new Set(collections)];
 }
-export async function insert_move(owner:number, move:Move) {
-   insert_moves(owner, [move]);
+export async function insert_move(owner:number, move:Move, collection="default") {
+   insert_moves(owner, [move], collection);
 }
-export async function insert_moves(owner:number, moves:Move[]) {
+export async function insert_moves(owner:number, moves:Move[], collection="default") {
     try {
         const ids = await moves_db.find({},  { projection: {
             _id: 0,
@@ -70,6 +70,7 @@ export async function insert_moves(owner:number, moves:Move[]) {
         for (let i = 0; i < moves.length; i++) {
             moves[i].id = max_id+i;
             moves[i].owner = owner;
+            moves[i].collection = collection;
         }
         
         const result = await moves_db.insertMany(moves);

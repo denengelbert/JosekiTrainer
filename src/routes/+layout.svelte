@@ -33,7 +33,10 @@ let currentTile: number = 0;
 	     border=""
 	        class="bg-surface-100-800-token w-full"
 >
-	<TabAnchor href="/review" selected={$page.url.pathname === '/review'}>
+    <TabAnchor href="/review" selected={$page.url.pathname === '/review'}>
+        <span>Review</span>
+    </TabAnchor>
+	<TabAnchor href="/study" selected={$page.url.pathname === '/study'}>
 		<span>Study</span>
 	</TabAnchor>
     <TabAnchor href="/submit" selected={$page.url.pathname === '/submit'}>
@@ -52,9 +55,9 @@ let currentTile: number = 0;
         </AppBar>
 
     </svelte:fragment>
-
     <slot />
-    <svelte:fragment slot="pageFooter"><p>(c) Gilles Englebert 2024</p></svelte:fragment>
+    
+    <svelte:fragment slot="pageFooter"><p class="centered">(c) Gilles Englebert 2024</p></svelte:fragment>
 </AppShell>
 
 

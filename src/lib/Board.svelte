@@ -1,6 +1,8 @@
 <script lang="ts">
-	import {go_board, stone_color} from "$lib/board"
-    import { draw } from "svelte/transition";
+	import {go_board, stone_color, str_to_pair, validPoint} from "$lib/board"
+    import { createEventDispatcher } from 'svelte';
+
+    const dispatch = createEventDispatcher();
 
  
     export let width= 600; 
@@ -22,6 +24,11 @@
 
     export function reset() {
         board = new go_board(board.size);
+        draw_board();
+    }
+
+    export function undo() {
+        board.undo();
         draw_board();
     }
 
@@ -68,7 +75,7 @@
         stones_context.fill();
     }
 
-    function draw_board(hx: number = -1, hy: number = -1){
+    export function draw_board(hx: number = -1, hy: number = -1){
         const stones_canvas = <HTMLCanvasElement> document.getElementById("stones"+id);
         if (stones_canvas === null) {
             console.log("No stones found");
@@ -95,6 +102,7 @@
        // console.log(x, y);
         if (board.play_move(x,y)) {
             draw_board(-1, -1);
+            click(x,y,board.current_turn);
             board = board; //to update captures
         }
     }
@@ -104,6 +112,10 @@
     function hover_point(event: { clientX: number; clientY: number; }){
         let x, y;
         [x, y] = get_coordinate(event.clientX, event.clientY);
+
+        if (!validPoint(x, y, board.size))
+            return;
+        
         if (board.state[x][y] != stone_color.empty)
             return;
         if (x != old_x || y != old_y)
@@ -111,11 +123,6 @@
         [old_x, old_y] = [x, y];
     }
 
-    function str_to_pair(move: string): [number, number] {
-        return [move.charCodeAt(0)-'a'.charCodeAt(0), 
-                move.charCodeAt(1)-'a'.charCodeAt(0)]
-    }
-    
 
     export function play_moves(moves: string[]): boolean {
 
@@ -137,6 +144,14 @@
             draw_stone(mv[i][0], mv[i][1], board.current_turn, true);
         return true;
     }
+
+    function click(x: number, y: number, color: stone_color) {
+		dispatch('clickedOn', {
+			x: x,
+            y: y,
+            color: color
+		});
+	}
 
 </script>
 

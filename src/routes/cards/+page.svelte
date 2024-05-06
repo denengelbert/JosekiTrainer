@@ -14,7 +14,7 @@
 		{#if collections}
 		{#each collections as coll}
 		<li>
-			<span>1.</span>
+			<span>.</span>
 			<span class="flex-auto">{coll}</span>
 			<span><form action="" method="post">
 				<button class="btn variant-filled-primary" name="id" value="{coll}">Study</button>

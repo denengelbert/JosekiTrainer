@@ -1,13 +1,11 @@
 import type {PageServerLoad, Action} from './$types'
 import { get_moves, delete_move} from '$lib/db/moves';
-import { fetch_scheduled_cards, fetch_cards} from '$lib/db/cards';
-import { get_current_user } from '$lib/user_management.js';
 
 export const load: PageServerLoad = async function() {
     try {
-        const data = await fetch_scheduled_cards(get_current_user().id);
+        const data = await get_moves(1, 5);
         console.log(data);
-        return {cards: data};
+        return {moves: data};
     } catch (err) {
         console.error(`Something went wrong trying to fetch the moves: ${err}\n`);
         return {};

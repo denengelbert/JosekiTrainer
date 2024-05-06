@@ -38,6 +38,7 @@
 	</script>
 	
 	
+
 	
 	<form method="POST" action="?/add">
 	<div class="card p-4">
@@ -50,12 +51,15 @@
 		{/if}
 		{#if feedback && joseki}
 			{feedback}
+			<input
+			name="collection"/>
 			<button class="btn variant-filled-primary">Submit</button>
 			<input
 					name="sgf"
 					value="{JSON.stringify(joseki)}"
 					style="visibility:hidden" 
 				/>
+
 		{/if}
 	
 	</div>
