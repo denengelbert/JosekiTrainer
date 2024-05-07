@@ -9,16 +9,15 @@
 </script>
 
 <div class="card p-4">
-	<p>The current collections are as follows: </p>
-	<ul class="list">
+	<p>Which collections would you like to study?</p>
+	<ul class="list-disc">
 		{#if collections}
 		{#each collections as coll}
 		<li>
-			<span>.</span>
-			<span class="flex-auto">{coll}</span>
-			<span><form action="" method="post">
-				<button class="btn variant-filled-primary" name="id" value="{coll}">Study</button>
-			</form></span>
+			<form action="" method="post">
+				<button class="btn variant-filled-primary" name="id" value="{coll[0]}">Study "{coll[0]}" collection with {coll[1]} { coll[1] > 1 ? "entries" : "entry"}</button>
+			</form>
+			<span> </span>
 			
 		</li>
 		{/each}

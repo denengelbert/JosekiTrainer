@@ -2,9 +2,11 @@
 	import {go_board, stone_color, str_to_pair, validPoint} from "$lib/board"
     import { createEventDispatcher } from 'svelte';
 
-    const dispatch = createEventDispatcher();
-
+    const dispatch = createEventDispatcher<{
+		clickedOn: {x:number, y:number, color:stone_color}; 
+	}>();
  
+    export let disabled = false;
     export let width= 600; 
     export let resolution = width; 
     let id = Math.floor(Math.random()*1000000);
@@ -97,6 +99,8 @@
     }
 
     function click_point(event: { clientX: number; clientY: number; }){
+        if (disabled)
+            return;
         let x, y;
         [x, y] = get_coordinate(event.clientX, event.clientY);
        // console.log(x, y);
@@ -110,6 +114,8 @@
     let old_x = -1, old_y = -1;
 
     function hover_point(event: { clientX: number; clientY: number; }){
+        if (disabled)
+            return;
         let x, y;
         [x, y] = get_coordinate(event.clientX, event.clientY);
 
@@ -131,17 +137,19 @@
             console.log('problem at playing moves');
             return false;
         }
-        console.log('OK');
+       // console.log('OK');
 
         draw_board();
         return true;
     }
     export function highlight(moves: [string,string][]): boolean {
-        //console.log(moves);
+        //console.log("highlight", moves);
         let mv:[number,number][] = moves.map( ([a,b])=> {return str_to_pair(a)});
-        console.log(moves.length);
-        for (let i =0; i < moves.length;i++)
+        console.log(mv);
+        for (let i =0; i < moves.length;i++) {
             draw_stone(mv[i][0], mv[i][1], board.current_turn, true);
+          //  console.log("draw");
+        }
         return true;
     }
 

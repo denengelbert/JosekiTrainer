@@ -1,7 +1,7 @@
 import db from '$lib/db/db'
 import {createEmptyCard, formatDate, fsrs, generatorParameters, Rating, Grades} from 'ts-fsrs';
 import type {Card as SRSCard} from 'ts-fsrs';
-import type { Move } from './moves';
+import { empty_Move, type Move } from './moves';
 
 export interface Card {
     id: number,
@@ -13,8 +13,8 @@ export interface Card {
     srs: SRSCard,
 }
 let cards_db = db.collection<Card>('reviews')
-const params = generatorParameters();
-const srs_algorithm = fsrs(params);
+const params = generatorParameters({w:[0.4, 0.6, 2.4, 5.8, 4.93, 0.94, 0.86, 0.01, 1.49, 0.14, 0.94, 2.18, 0.05, 0.34, 1.26, 0.29, 2.61] });
+export const srs_algorithm = fsrs(params);
 
 export default db.collection('reviews')
 
@@ -49,8 +49,66 @@ export async function insert_cards(cards: Card[]) {
         console.log("Could not insert card successfully: ", err);
       }  
 }
-export async function update_card(card: Card) {
+export async function update_card(card_id:number, srs:SRSCard) {
+  try {
+    const query = { id: card_id as number};
+    console.log(query);
+    const fetch = await cards_db.findOne(query);
 
+
+    const result =  await cards_db.updateOne(query, 
+      {$set: { srs : srs}});
+   if (result && result.matchedCount) {
+    console.log(`Successfully updated card with id ${card_id}`);
+    } else if (!result) {
+    console.log(`Failed to update card with id ${card_id}`);
+    } else if (!result.matchedCount) {
+      console.log(result);
+    console.log(`Card with id ${card_id} does not exist`);
+    }
+  } catch(err) {
+    console.log("Could not update card ${card.id} successfully: ", err);
+  }  
+}
+export async function delete_card(card_id:number) {
+  try {
+    const query = { id: card_id};
+    console.log(query);
+    const result =  await cards_db.deleteOne(query);
+   if (result && result.deletedCount) {
+    console.log(`Successfully removed card with id ${card_id}`);
+  } else if (!result) {
+    console.log(`Failed to remove move with id ${card_id}`);
+  } else if (!result.deletedCount) {
+    console.log(`Card with id ${card_id} does not exist`);
+}
+} catch(err) {
+  console.log("Could not delete card ${card.id}successfully: ", err);
+}  
+}
+export async function fetch_card_by_id(id:number): Promise<Card> {
+  let cards:Card[] = [];
+  try {
+      cards = await cards_db.find({id:id},  { projection: {
+          _id: 0,
+          id: 1,
+          owner: 1, 
+          move: 1, 
+          quest_type: 1, 
+          collection: 1,
+          buried: 1,
+          srs: 1,
+      }}).toArray();
+    } catch(err) {
+      console.log("Could not fetch existing cards: ", err);
+    } 
+    if (cards.length == 0)
+      return empty_card(1, empty_Move());
+    else {
+     // console.log(cards);
+      return cards[0];
+    
+    }
 }
 
 export async function fetch_cards(owner: number): Promise<Card[]> {
@@ -62,7 +120,7 @@ export async function fetch_cards(owner: number): Promise<Card[]> {
             owner: 1, 
             move: 1, 
             quest_type: 1, 
-            stack: 1,
+            collection: 1,
             buried: 1,
             srs: 1,
         }}).toArray();

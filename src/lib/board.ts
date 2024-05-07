@@ -85,7 +85,7 @@ export class go_board {
     }
 
     play_move(x:number, y:number): boolean {
-        console.log(x,y);
+       // console.log(x,y);
         if (!validPoint(x,y,this.size))
             return true;
         if (this.state[x][y] === stone_color.black || this.state[x][y] === stone_color.white)

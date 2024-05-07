@@ -20,8 +20,8 @@
 
 </script>
  
-<div class="h-auto p-4 grid grid-cols-[80%_20%] place-items-center">
-	<div class="h-1/2 w-1/2">
+<div class="h-auto p-4 grid grid-cols-[60%_40%] place-items-top">
+	<div class="h-full w-full">
 		<Board bind:turn={turn} 
 		bind:bcaptures={bcaptures}
 		bind:wcaptures={wcaptures}
@@ -38,7 +38,8 @@
 	{#each moves as move}
 	<div class="card p-3 variant-filled-secondary basis-auto gap-4">
 		<div class=" flex flex-col content-start gap-2">
-			<div><button class="btn variant-filled-primary basis-auto " on:click={() => {board.reset();board.play_moves(move.current_pos);board.highlight(move.next_moves);board.draw_board();}}>Joseki</button>
+			<p>Collection: {move.collection}</p>
+			<div><button class="btn variant-filled-primary basis-auto " on:click={() => {board.reset();board.play_moves(move.current_pos);board.draw_board();board.highlight(move.next_moves);}}>Joseki</button>
 			</div>
 			<div>
 				<form action="" method="post">

@@ -23,6 +23,7 @@ export default moves_db
 export async function get_moves(owner:number, count:number = 100, collection:string='none'): Promise<Move[]> {
     let moves = null;
     try {
+        if (collection == "none")  
         moves = await moves_db.find({owner: owner},  { projection: {
             _id: 0,
             id: 1,
@@ -32,6 +33,16 @@ export async function get_moves(owner:number, count:number = 100, collection:str
             next_moves: 1,
             collection: 1,
         }}).toArray();
+        else 
+        moves = await moves_db.find({owner: owner, collection: collection},  { projection: {
+          _id: 0,
+          id: 1,
+          owner: 1,
+          current_pos: 1, 
+          final_pos: 1,
+          next_moves: 1,
+          collection: 1,
+      }}).toArray();
       } catch(err) {
         console.log("Could not fetch existing Joseki: ", err);
       } 
@@ -41,21 +52,30 @@ export async function get_moves(owner:number, count:number = 100, collection:str
         return moves;
 }
 
-export async function get_collections(owner:number, count:number = 100): Promise<string[]> {
+export async function get_collections(owner:number, count:number = 100): Promise<[string, number][]> {
   let collections = null;
   try {
       const col= await moves_db.find({owner: owner},  { projection: {
           _id: 0,
           collection: 1,
       }}).toArray();
-      collections = col.map((cur)=>{return cur.collection});
+      collections = col.map((cur)=>  cur.collection);
     } catch(err) {
       console.log("Could not fetch list of collections: ", err);
     }
     if (collections === null)
       return [];
-    else
-      return [...new Set(collections)];
+    else {
+      const names =  [...new Set(collections)];
+      let colls: [string, number][] = names.map((name) => [name, 0]);
+      for (var nm of collections) {
+        for (var i in colls) {
+          if (colls[i][0] == nm)
+            colls[i][1]++;
+        }
+      }
+      return colls;
+    }
 }
 export async function insert_move(owner:number, move:Move, collection="default") {
    insert_moves(owner, [move], collection);

@@ -4,9 +4,9 @@ import { load_sgf, empty_sgf_node } from '$lib/sgf.js';
 import type { sgf_node } from '$lib/sgf.js';
 import { get_current_user } from '$lib/user_management.js';
 
-
-export function load({ cookies }) {
-	// ...
+/** @type {import('./$types').PageServerLoad} */
+export async function load({ cookies}) {
+	const user = cookies.get('sessionid');
 }
 //{"move":"","annotation":"","next":[{"move":"pd","annotation":"","next":[[{"move":"qc","annotation":";B[pc];W[qd])","next":[{"move":"pc","annotation":"","next":[[{"move":"qd","annotation":")","next":[]}]]}]},
 //{"move":"qf","annotation":";B[nc];W[qd])","next":{}}]]}]}
@@ -34,6 +34,7 @@ function get_new_moves(sgf: sgf_node[], current:string[] = []): Move[] {
   return ret.slice(0, -1);
 } 
 
+/** @type {import('./$types').Actions} */
 export const actions = {
 	parse: async ({ cookies, request }) => {
         const data = await request.formData();
