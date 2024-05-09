@@ -15,7 +15,7 @@ export async function load({ cookies}) {
 function get_new_moves(sgf: sgf_node[], current:string[] = []): Move[] {
   let ret: Move[] = [];
   let current_node: sgf_node = sgf[0];
-  //console.log(josekis);
+  //console.log(sgf);
   for (let i =0; i < sgf.length; i++) {
     current_node = sgf[i];
     //console.log(joseki)
@@ -31,7 +31,7 @@ function get_new_moves(sgf: sgf_node[], current:string[] = []): Move[] {
     }
     ret = ret.concat(get_new_moves(current_node.next, cpos))
   }
-  return ret.slice(0, -1);
+  return ret;
 } 
 
 /** @type {import('./$types').Actions} */

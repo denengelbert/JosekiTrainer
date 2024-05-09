@@ -22,32 +22,33 @@ let currentTile: number = 0;
 
         <AppBar gridColumns="grid-cols-3" slotDefault="place-self-center" slotTrail="place-content-end">
             <svelte:fragment slot="lead"><img alt="Logo" src="favicon.png" style="width: 50px; height: 50px"/></svelte:fragment>
-            <h1 class="h1">Go Trainer</h1>
+            <div class="flex items-center gap-4">
+                <h2 class="h2">GoTrainer </h2>
+                
+                <TabGroup 
+                justify="justify-center"
+                active="variant-filled-primary"
+                hover="hover:variant-soft-primary"
+                flex="flex-1 lg:flex-none"
+                rounded=""
+                border=""
+                class="bg-surface-100-800-token w-full">
+                <TabAnchor href="/review" selected={$page.url.pathname === '/review'}>
+                    <span>Review</span>
+                </TabAnchor>
+                <TabAnchor href="/study" selected={$page.url.pathname === '/study'}>
+                    <span>Study</span>
+                </TabAnchor>
+                <TabAnchor href="/submit" selected={$page.url.pathname === '/submit'}>
+                    <span>Add</span>
+                </TabAnchor>
+                
+        <!-- <TabAnchor href="/cards" selected={$page.url.pathname === '/cards'}>
+                    <span>Cards</span>
+                </TabAnchor>-->
+                 </TabGroup>
+            </div>
             
-            <TabGroup 
-	    justify="justify-center"
-	    active="variant-filled-primary"
-	    hover="hover:variant-soft-primary"
-	    flex="flex-1 lg:flex-none"
-	     rounded=""
-	     border=""
-	        class="bg-surface-100-800-token w-full"
->
-    <TabAnchor href="/review" selected={$page.url.pathname === '/review'}>
-        <span>Review</span>
-    </TabAnchor>
-	<TabAnchor href="/study" selected={$page.url.pathname === '/study'}>
-		<span>Study</span>
-	</TabAnchor>
-    <TabAnchor href="/submit" selected={$page.url.pathname === '/submit'}>
-
-		<span>Add</span>
-	</TabAnchor>
-    <TabAnchor href="/cards" selected={$page.url.pathname === '/cards'}>
-		<span>Cards</span>
-	</TabAnchor>
-	<!-- ... -->
-</TabGroup>
             <svelte:fragment slot="trail"><Avatar initials="{get_initials(get_current_user().full)}" background="bg-primary-500" 
             border="border-4 border-surface-300-600-token hover:!border-primary-500"
             cursor="cursor-pointer" on:click={()=>{goto('/login')}}/>

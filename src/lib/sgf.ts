@@ -24,7 +24,7 @@ export function load_sgf(input: string): sgf_node[] {
             throw 'Malformed SGF' ;
         }
 
-       // console.log(input);
+        console.log(input);
         //remove comments
          while (input.includes('C')) {
             let start = input.indexOf('C');
@@ -40,6 +40,7 @@ export function load_sgf(input: string): sgf_node[] {
            // console.log("   ");
          }
     }
+    console.log(input);
     let res: any[] = [];
     let branch: string;
     if (input.length < 5)
@@ -113,3 +114,12 @@ function find_closing_bracket(input: string): number {
     }
     return -1;
 }
+function find_closing_bracket_round(input: string): number {
+    let cur = 0;
+       for (let i = 0; i < input.length; i++) {
+           if (input[i] === "(") cur++;
+           if (input[i] === ")") cur--;
+           if (cur === 0) return i;
+       }
+       return -1;
+   }

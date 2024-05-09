@@ -16,15 +16,15 @@ export const load: PageServerLoad = async function() {
 }
 
 export const actions = {
-	default: async ({ cookies, request }) => {
+	default: async function ({ request }) {
         const data = await request.formData();
-        const collection = data.get('id');
+        const collection = String(data.get('id'));
         console.log(collection);
 
         const moves = await get_moves(get_current_user().id, 100, collection);
         let cards: Array<Card> = [];
-        for (let i = 0; i < moves.length; i++) 
-            cards.push( empty_card(get_current_user().id, moves[i], 'next_move', collection));
+        for (let i = 0; i < moves.length; i++)
+            cards.push(empty_card(get_current_user().id, moves[i], 'next_move', collection));
         insert_cards(cards);
     }
 };

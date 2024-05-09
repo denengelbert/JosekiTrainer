@@ -41,7 +41,7 @@
 
 	
 	<form method="POST" action="?/add">
-	<div class="card p-4">
+	<div class="card p-4 card-hover">
 		{#if !feedback}
 		<FileDropzone name="sgf_file" on:change={onChangeHandler} bind:files={files}>
 			<svelte:fragment slot="message">
@@ -52,7 +52,7 @@
 		{#if feedback && joseki}
 			{feedback}
 			<input
-			name="collection"/>
+			name="collection" class="input"/>
 			<button class="btn variant-filled-primary">Submit</button>
 			<input
 					name="sgf"

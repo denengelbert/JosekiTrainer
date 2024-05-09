@@ -45,6 +45,7 @@
 		}
 
 		if (!found) {
+			alert("Noooo")
 			board.undo();
 		}
 		
@@ -61,59 +62,66 @@
 	board.draw_board();}
 	} 
 />
-<div class="h-auto p-4 grid grid-cols-[60%_40%] place-items-top">
-	<div class="h-1/2 w-1/2">
+<div class="h-dvh w-full p-4 grid grid-cols-[43%_57%] gap-4">
+	<div class="h-full w-full flex flex-col gap-2">
 		<Board bind:turn={turn} 
 		bind:bcaptures={bcaptures}
 		bind:wcaptures={wcaptures}
 		bind:this={board}
 		bind:disabled={disableBoard}
-		width={600}
+		width={1600}
 		on:clickedOn={registerClick}/> 
+
 		<form method="POST" action="?/repeat">
-			<div class="card p-4">
+			
 				{#if correctMove == true}
-					<input name="id" value="{current_card.id}" style="visibility:hidden">
-					<input name="level" bind:value={level} style="visibility:hidden">
-					<button class="btn variant-filled-primary" on:click={()=>{level = Rating.Hard}}> Hard</button>
-					<button class="btn variant-filled-primary" on:click={()=>{level = Rating.Good}}> Good</button>
-					<button class="btn variant-filled-primary" on:click={()=>{level = Rating.Easy}}> Easy</button>
+				<div class="flex flex-row content-start gap-2">
+					<button class="btn variant-filled-primary basis-1/3" on:click={()=>{level = Rating.Hard}}> Hard</button>
+					<button class="btn variant-filled-primary basis-1/3" on:click={()=>{level = Rating.Good}}> Good</button>
+					<button class="btn variant-filled-primary basis-1/3" on:click={()=>{level = Rating.Easy}}> Easy</button>
+
+				</div>
+
+				<input name="id" value="{current_card.id}" style="visibility:hidden">
+				<input name="level" bind:value={level} style="visibility:hidden">
+
 				{/if}
 				{#if correctMove == false} 
-					<input name="id" value="{current_card.id}" style="visibility:hidden">
-					<input name="level" value="{Rating.Again}" style="visibility:hidden">
-					<button class="btn variant-filled-warning">Forgot</button>
+				<div class="flex flex-row content-start gap-2">
+					<button class="btn variant-filled-primary w-full">Forgot</button>
+				</div>
+				<input name="id" value="{current_card.id}" style="visibility:hidden">
+				<input name="level" value="{Rating.Again}" style="visibility:hidden">
 				{/if}
-				
-			</div>
 			</form>
 
+
 	</div>
+	
 	
 	<div class="h-full flex flex-col content-start gap-4">
 
 	{#if cards}
 	{#each cards as card}
-	<div class="card p-3 variant-filled-secondary basis-auto gap-4">
-		<div class=" flex flex-col content-start gap-2">
-			<div>
-				<p>Due: {card.srs.due.getDate()+1}/{card.srs.due.getMonth()+1}</p>
-				<p>Repetitions: {card.srs.reps}</p>
-				<p>Collection: {card.collection}</p>
-				<button class="btn variant-filled-primary" 
+	<div>
+		<div class="flex flex-row gap-2">
+				<button class="h4 basis-full chip variant-soft hover:variant-filled" 
 				on:click={() => {board.reset();
 					board.play_moves(card.move.current_pos);board.draw_board();
 					current_card = card;
 					correctMove = false;}}>
-				Show 
-			</button>
-			</div>
+				{card.collection} ({card.srs.due.getDate()+1}/{card.srs.due.getMonth()+1} R:{card.srs.reps})
+				</button>
+				
+			
+				<div>
+					<form action="?/delete" method="post">
+						<button class="btn variant-filled-error" name="id" value="{card.id}">Delete</button>
+						 </form>
+				</div>
+
 		</div>
-		<div>
-			<form action="?/delete" method="post">
-				<button class="btn variant-filled-error" name="id" value="{card.id}">Delete</button>
-				 </form>
-		</div>
+	
 	</div>
 	{/each}
 	{/if}

@@ -115,3 +115,21 @@ export async function delete_move( move_id:number) {
         console.log("Could not delete move ${move_id} successfully: ", err);
       }  
 }
+
+export async function delete_collection( collection: String) {
+
+  try {
+        const query = { collection: collection};
+        const result =  await moves_db.deleteMany(query);
+
+       if (result && result.deletedCount) {
+        console.log(`Successfully removed collection ${collection}`);
+      } else if (!result) {
+        console.log(`Failed to remove collection ${collection}`);
+      } else if (!result.deletedCount) {
+        console.log(`collection ${collection}does not exist`);
+    }
+   } catch(err) {
+      console.log("Could not delete move ${move_id} successfully: ", err);
+    }  
+}
