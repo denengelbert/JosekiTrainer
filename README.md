@@ -15,8 +15,8 @@ This is a small web app I created in Sveltekit, using Tailwind CSS and MongoDB t
 
 ###Screenshots
 
-![Alt text](https://github.com/denengelbert/JosekiTrainer/blob/master/img/review.png?raw=true)
+![Alt text](https://github.com/denengelbert/JosekiTrainer/blob/master/static/review.png?raw=true)
 
-![Alt text](https://github.com/denengelbert/JosekiTrainer/blob/master/img/study.png?raw=true)
+![Alt text](https://github.com/denengelbert/JosekiTrainer/blob/master/static/study.png?raw=true)
 
-![Alt text](https://github.com/denengelbert/JosekiTrainer/blob/master/img/upload.png?raw=true)
+![Alt text](https://github.com/denengelbert/JosekiTrainer/blob/master/static/upload.png?raw=true)
